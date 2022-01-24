@@ -1,5 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import {buffer, filter, fromEvent, interval, Observable, throttleTime, merge, debounceTime, map} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import {
+  buffer,
+  filter,
+  fromEvent,
+  interval,
+  debounceTime,
+} from 'rxjs';
 import { delay, take, exhaustMap } from 'rxjs/operators';
 
 
@@ -9,34 +15,34 @@ import { delay, take, exhaustMap } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit{
-  title = 'stopwatch';
   startStopwatch?: boolean;
-  // @ts-ignore
-  time = new Date(null);
-  source$ : any;
-  clicks = fromEvent(document, 'click');
-  lastStopedTime: any = 0;
+  time = new Date(0);
+  source$: any;
+  lastStopedTime: number = 0;
+  click$: any;
 
   ngOnInit() {
     this.startStopwatch = false;
-
-    // @ts-ignore
-    const waitButton$ = fromEvent(document.getElementById('waitButton'), 'click')
+    const waitButton$ = fromEvent(<EventTarget>document.getElementById('waitButton'), 'click');
 
     const buff$ = waitButton$.pipe(
       debounceTime(300),
     )
 
-    const click$ = waitButton$.pipe(
+    this.click$ = waitButton$.pipe(
       buffer(buff$),
-      map(list => {
-        return list.length;
+      filter(list => {
+        return list.length === 2
       }),
-      filter(x => x === 2),
     )
     .subscribe(() => {
       this.waitTimer();
     })
+  }
+
+  ngOnDestroy() {
+    this.click$.unsubscribe();
+    this.source$.unsubscribe();
   }
 
   startStop() {
@@ -55,8 +61,7 @@ export class AppComponent implements OnInit{
   }
 
   stopTimer() {
-    // @ts-ignore
-    this.time = new Date(null);
+    this.time = new Date(0);
     this.source$.unsubscribe();
 
     this.startStopwatch = false;
@@ -69,10 +74,11 @@ export class AppComponent implements OnInit{
   }
 
   resetTimer() {
-    // @ts-ignore
-    this.time = new Date(null);
+    this.time = new Date(0);
     this.source$.unsubscribe();
 
     this.startTimer()
   }
+
+
 }

@@ -20,6 +20,7 @@
       class="button"
       type="button"
       id="waitButton"
+      [disabled]="!this.startStopwatch"
     >
       Wait
     </button>
@@ -28,6 +29,7 @@
       class="button"
       type="button"
       (click)="resetTimer()"
+      [disabled]="!this.startStopwatch"
     >
       Reset
     </button>
